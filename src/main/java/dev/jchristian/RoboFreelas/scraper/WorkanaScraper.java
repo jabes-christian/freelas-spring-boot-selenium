@@ -19,8 +19,10 @@ public class WorkanaScraper extends BaseScraper {
     private static final String URL_PROJETOS     = "https://www.workana.com/jobs?language=pt&category=it-programming";
 
     private static final List<String> TERMOS_BUSCA = List.of(
-            "RPA", "automação", "selenium", "bot", "inteligência artificial",
-            "machine learning", "python", "IA", "agente"
+            "RPA", "automação", "robô", "selenium",
+            "inteligência artificial", "machine learning",
+            "IA", "agente de IA", "web scraping",
+            "processamento automatizado", "bot"
     );
 
     public WorkanaScraper(WebDriver driver) {
