@@ -52,13 +52,10 @@ public class OpportunityService {
             log.debug("[Service] Duplicata ignorada: {}", dto.titulo());
             return false;
         }
-
-        // Converte DTO → Entity e persiste
         Opportunity opportunity = toEntity(dto);
         repository.save(opportunity);
         log.info("[Service] Nova oportunidade salva: {}", dto.titulo());
 
-        // Dispara notificação no Telegram
         notificar(opportunity);
 
         return true;
@@ -68,14 +65,11 @@ public class OpportunityService {
         try {
             telegramService.enviarNotificacao(opportunity);
 
-            // Marca como notificada e atualiza no banco
             opportunity.setNotificado(true);
             repository.save(opportunity);
 
             log.info("[Service] Notificação enviada para: {}", opportunity.getTitulo());
         } catch (Exception e) {
-            // Falha no Telegram não impede que a oportunidade fique salva no banco
-            // Na próxima execução, o scheduler pode reprocessar via findByNotificadoFalse()
             log.error("[Service] Falha ao notificar '{}': {}", opportunity.getTitulo(), e.getMessage());
         }
     }
