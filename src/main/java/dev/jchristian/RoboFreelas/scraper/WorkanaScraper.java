@@ -86,7 +86,6 @@ public class WorkanaScraper extends BaseScraper {
                 return null;
             }
 
-            // Garante que o link é absoluto
             if (!link.startsWith("http")) {
                 link = URL_BASE + link;
             }
@@ -99,20 +98,12 @@ public class WorkanaScraper extends BaseScraper {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Filtro por relevância
-    // -------------------------------------------------------------------------
-
     private boolean contemTermoRelevante(OpportunityDTO dto) {
         String conteudo = (dto.titulo() + " " + dto.descricao()).toLowerCase();
 
         return TERMOS_BUSCA.stream()
                 .anyMatch(termo -> conteudo.contains(termo.toLowerCase()));
     }
-
-    // -------------------------------------------------------------------------
-    // Helpers internos — trabalham dentro do contexto de um WebElement pai
-    // -------------------------------------------------------------------------
 
     private String extrairTextoDoElemento(WebElement pai, String cssSelector) {
         try {
@@ -130,10 +121,6 @@ public class WorkanaScraper extends BaseScraper {
             return "";
         }
     }
-
-    // -------------------------------------------------------------------------
-    // Tratamento de cookies
-    // -------------------------------------------------------------------------
 
     private void aceitarCookiesSeNecessario() {
         try {
