@@ -48,7 +48,7 @@ public class OpportunityService {
     private boolean processarOportunidade(OpportunityDTO dto) {
 
         // Coração da deduplicação — consulta apenas pelo link
-        if (repository.existsByLink(dto.getLink())) {
+        if (repository.existsByLink(dto.link())) {
             log.debug("[Service] Duplicata ignorada: {}", dto.titulo());
             return false;
         }
