@@ -149,7 +149,7 @@ src/main/java/dev/jchristian/RoboFreelas/
 │   └── TelegramNotificationService.java   # Serviço que faz integração com Telegarm
 │
 ├── scheduler/
-│   └── MonitorScheduler.java              # 🚧 Em desenvolvimento
+│   └── MonitorScheduler.java              # Orquestrar as Scheduler's
 │
 ├── repository/
 │   └── OpportunityRepository.java         # JpaRepository + queries de deduplicação
