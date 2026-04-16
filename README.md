@@ -47,10 +47,11 @@ Status   : Analisado em 08/04/2026 às 14:32
 - [x] Deduplicação automática — mesma oportunidade nunca é notificada duas vezes
 - [x] Persistência no PostgreSQL com histórico completo
 - [x] Modo headless — roda sem abrir janela do browser
+- [x] Integração com Telegram Bot para notificações em tempo real
+- [x] Agendamento automático a cada 30/60 minutos com `@Scheduled`
+- [x] Reprocessamento de notificações pendentes em caso de falha do Telegram
 
 ### Em desenvolvimento 🚧
-- [ ] Integração com Telegram Bot para notificações em tempo real
-- [ ] Agendamento automático a cada 30/60 minutos com `@Scheduled`
 - [ ] Reprocessamento de notificações pendentes em caso de falha do Telegram
 - [ ] Scraper do 99Freelas
 
@@ -135,29 +136,29 @@ Status   : Analisado em 08/04/2026 às 14:32
 src/main/java/dev/jchristian/RoboFreelas/
 │
 ├── config/
-│   └── SeleniumConfig.java              # WebDriver bean (headless Chrome)
+│   └── SeleniumConfig.java                # WebDriver bean (headless Chrome)
 │
 ├── scraper/
 │   ├── base/
-│   │   └── BaseScraper.java             # Métodos comuns: navegação, esperas, interações
-│   ├── WorkanaScraper.java              # ✅ Funcional
-│   └── FreelasScraper.java              # 🚧 Planejado
+│   │   └── BaseScraper.java               # Métodos comuns: navegação, esperas, interações
+│   ├── WorkanaScraper.java                # ✅ Funcional
+│   └── FreelasScraper.java                # 🚧 Planejado
 │
 ├── service/
-│   ├── OpportunityService.java          # Orquestra scrapers + deduplicação
-│   └── TelegramNotificationService.java # 🚧 Em desenvolvimento
+│   ├── OpportunityService.java            # Orquestra scrapers + deduplicação
+│   └── TelegramNotificationService.java   # Serviço que faz integração com Telegarm
 │
 ├── scheduler/
-│   └── MonitorScheduler.java            # 🚧 Em desenvolvimento
+│   └── MonitorScheduler.java              # 🚧 Em desenvolvimento
 │
 ├── repository/
-│   └── OpportunityRepository.java       # JpaRepository + queries de deduplicação
+│   └── OpportunityRepository.java         # JpaRepository + queries de deduplicação
 │
 ├── entity/
-│   └── Opportunity.java                 # Entidade JPA — tabela opportunities
+│   └── Opportunity.java                   # Entidade JPA — tabela opportunities
 │
 └── dto/
-    └── OpportunityDTO.java              # Record — objeto de transporte entre scraper e service
+    └── OpportunityDTO.java                # Record — objeto de transporte entre scraper e service
 ```
 
 ---
@@ -275,13 +276,13 @@ v0.1 — Scraper Base                    ✅ Concluído
   └── WorkanaScraper funcional
   └── Deduplicação e persistência
 
-v0.2 — Notificações                    🚧 Em andamento
+v0.2 — Notificações                    ✅ Concluído
   └── TelegramNotificationService
   └── MonitorScheduler com @Scheduled
   └── Reprocessamento de pendências
 
-v0.3 — Expansão de Fontes             📌 Planejado
-  └── FreelasScraper (99Freelas)
+v0.3 — Expansão de Fontes              🚧 Em andamento
+  └── FreelasScraper (99Freelas)      
   └── LicitacaoScraper (portais públicos)
 
 v0.4 — Dockerização Completa          📌 Planejado
