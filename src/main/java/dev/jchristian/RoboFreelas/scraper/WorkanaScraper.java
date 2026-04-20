@@ -10,20 +10,44 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
 public class WorkanaScraper extends BaseScraper {
 
-    private static final String URL_BASE        = "https://www.workana.com";
-    private static final String URL_PROJETOS     = "https://www.workana.com/jobs?language=pt&category=it-programming";
+    private static final String URL_BASE     = "https://www.workana.com";
+    private static final String URL_PROJETOS = "https://www.workana.com/jobs?language=pt&category=it-programming";
 
-    private static final List<String> TERMOS_BUSCA = List.of(
-            "RPA", "automação", "robô", "selenium",
-            "inteligência artificial", "machine learning",
-            "IA", "agente de IA", "web scraping",
-            "processamento automatizado", "bot"
+
+    private static final List<String> TERMOS_RPA = List.of(
+            "rpa", "automação", "automacao", "robô", "robo",
+            "automatizar", "automatização", "automatizacao",
+            "processamento automático", "processamento automatico"
     );
+
+    private static final List<String> TERMOS_SCRAPING = List.of(
+            "scraping", "web scraping", "raspagem", "extração de dados",
+            "extracao de dados", "crawler", "coleta de dados", "selenium"
+    );
+
+    private static final List<String> TERMOS_CHATBOT_IA = List.of(
+            "chatbot", "chat bot", "agente de ia", "agente ia",
+            "inteligência artificial", "inteligencia artificial",
+            "llm", "gpt", "langchain", "bot inteligente",
+            "assistente virtual", "assistente de ia", "ia conversacional"
+    );
+
+    private static final List<String> TERMOS_INTEGRACAO = List.of(
+            "integração", "integracao", "api rest", "webhook",
+            "sincronização", "sincronizacao", "middleware",
+            "integrar sistemas", "integração de sistemas"
+    );
+
+    private static final List<String> TODOS_TERMOS = Stream.of(
+                    TERMOS_RPA, TERMOS_SCRAPING, TERMOS_CHATBOT_IA, TERMOS_INTEGRACAO)
+            .flatMap(List::stream)
+            .toList();
 
     public WorkanaScraper(WebDriver driver) {
         super(driver);
@@ -54,10 +78,20 @@ public class WorkanaScraper extends BaseScraper {
                 try {
                     OpportunityDTO dto = extrairDadosDoCard(card);
 
-                    if (dto != null && contemTermoRelevante(dto)) {
-                        oportunidades.add(dto);
-                        log.info("[Workana] Oportunidade relevante: {}", dto.titulo());
+                    if (dto == null) continue;
+
+                    if (!temValorDefinido(dto)) {
+                        log.debug("[Workana] Ignorado — sem valor definido: {}", dto.titulo());
+                        continue;
                     }
+
+                    if (!contemTermoRelevante(dto)) {
+                        log.debug("[Workana] Ignorado — fora do escopo: {}", dto.titulo());
+                        continue;
+                    }
+
+                    oportunidades.add(dto);
+                    log.info("[Workana] Oportunidade relevante: {}", dto.titulo());
 
                 } catch (Exception e) {
                     log.warn("[Workana] Erro ao processar card — pulando: {}", e.getMessage());
@@ -99,10 +133,21 @@ public class WorkanaScraper extends BaseScraper {
     }
 
     private boolean contemTermoRelevante(OpportunityDTO dto) {
-        String conteudo = (dto.titulo() + " " + dto.descricao()).toLowerCase();
+        String titulo    = dto.titulo().toLowerCase();
+        String descricao = dto.descricao().toLowerCase();
 
-        return TERMOS_BUSCA.stream()
-                .anyMatch(termo -> conteudo.contains(termo.toLowerCase()));
+        boolean tituloRelevante    = TODOS_TERMOS.stream().anyMatch(titulo::contains);
+        boolean descricaoRelevante = TODOS_TERMOS.stream().anyMatch(descricao::contains);
+
+        return tituloRelevante && descricaoRelevante;
+    }
+
+    private boolean temValorDefinido(OpportunityDTO dto) {
+        String valor = dto.valor();
+        return valor != null
+                && !valor.isBlank()
+                && !valor.equalsIgnoreCase("não informado")
+                && !valor.equalsIgnoreCase("a combinar");
     }
 
     private String extrairTextoDoElemento(WebElement pai, String cssSelector) {
