@@ -1,6 +1,6 @@
 # 🤖 RoboFreelas — Monitor Automático de Oportunidades
 
-> **Status: Em andamento** 🚧 — Scraper do Workana funcional. Integração com Telegram e agendamento em desenvolvimento.
+> **Status: Em andamento** 🚧 — Scraper do Workana e 99freelas funcional. Integração com Telegram e agendamento em desenvolvimento.
 
 Sistema de monitoramento automatizado de oportunidades de freelance e licitações públicas, com notificações em tempo real via Telegram. O robô acessa periodicamente os portais, filtra projetos relevantes por palavras-chave (RPA, IA, Automação) e notifica instantaneamente quando uma oportunidade inédita é encontrada.
 
@@ -43,6 +43,7 @@ Status   : Analisado em 08/04/2026 às 14:32
 
 ### Implementadas
 - [x] Extração de oportunidades do Workana (título, valor, link, descrição)
+- [x] Extração de oportunidades do 99freelas (título, categoria, link, descrição)
 - [x] Filtro por palavras-chave relevantes (RPA, IA, Automação, Selenium, Bot...)
 - [x] Deduplicação automática — mesma oportunidade nunca é notificada duas vezes
 - [x] Persistência no PostgreSQL com histórico completo
@@ -50,10 +51,6 @@ Status   : Analisado em 08/04/2026 às 14:32
 - [x] Integração com Telegram Bot para notificações em tempo real
 - [x] Agendamento automático a cada 30/60 minutos com `@Scheduled`
 - [x] Reprocessamento de notificações pendentes em caso de falha do Telegram
-
-### Em desenvolvimento 🚧
-- [ ] Reprocessamento de notificações pendentes em caso de falha do Telegram
-- [ ] Scraper do 99Freelas
 
 ### Planejadas 📌
 - [ ] Scraper de Portais de Licitação públicos
@@ -110,12 +107,12 @@ Status   : Analisado em 08/04/2026 às 14:32
                        │
 ┌──────────────────────▼──────────────────────────────┐
 │                  Scraper Layer                       │
-│     WorkanaScraper · FreelasScraper (em breve)      │
+│     WorkanaScraper · FreelasScraper      │
 │         Selenium Headless + WebDriverWait            │
 └──────┬───────────────┬──────────────────────────────┘
        │               │
    Workana          99Freelas
-  (funcional)      (planejado)
+  (funcional)      (funcional)
        │               │
 ┌──────▼───────────────▼──────────────────────────────┐
 │               OpportunityService                     │
@@ -142,7 +139,7 @@ src/main/java/dev/jchristian/RoboFreelas/
 │   ├── base/
 │   │   └── BaseScraper.java               # Métodos comuns: navegação, esperas, interações
 │   ├── WorkanaScraper.java                # ✅ Funcional
-│   └── FreelasScraper.java                # 🚧 Planejado
+│   └── FreelasScraper.java                # ✅ Funcional
 │
 ├── service/
 │   ├── OpportunityService.java            # Orquestra scrapers + deduplicação
@@ -274,6 +271,7 @@ https://api.telegram.org/bot<SEU_TOKEN>/getUpdates
 ```
 v0.1 — Scraper Base                    ✅ Concluído
   └── WorkanaScraper funcional
+  └── FreelasScraper funcional
   └── Deduplicação e persistência
 
 v0.2 — Notificações                    ✅ Concluído
@@ -281,8 +279,7 @@ v0.2 — Notificações                    ✅ Concluído
   └── MonitorScheduler com @Scheduled
   └── Reprocessamento de pendências
 
-v0.3 — Expansão de Fontes              🚧 Em andamento
-  └── FreelasScraper (99Freelas)      
+v0.3 — Expansão de Fontes              🚧 Em andamento      
   └── LicitacaoScraper (portais públicos)
 
 v0.4 — Dockerização Completa          📌 Planejado

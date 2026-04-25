@@ -1,6 +1,7 @@
 package dev.jchristian.RoboFreelas.scheduler;
 
 import dev.jchristian.RoboFreelas.dto.OpportunityDTO;
+import dev.jchristian.RoboFreelas.scraper.FreelasScraper;
 import dev.jchristian.RoboFreelas.scraper.WorkanaScraper;
 import dev.jchristian.RoboFreelas.service.OpportunityService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 public class MonitorScheduler {
 
     private final WorkanaScraper workanaScraper;
+    private final FreelasScraper freelasScraper;
     private final OpportunityService opportunityService;
 
     private static final DateTimeFormatter FORMATTER =
@@ -48,8 +50,7 @@ public class MonitorScheduler {
 
     private void executarScrapers() {
         executarScraper("Workana", workanaScraper::extrair);
-        // Adicione novos scrapers aqui conforme forem implementados
-        // executarScraper("99Freelas", freelasScraper::extrair);
+        executarScraper("99Freelas", freelasScraper::extrair);
         // executarScraper("Licitações", licitacaoScraper::extrair);
     }
 
