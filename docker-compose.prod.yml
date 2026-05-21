@@ -1,0 +1,66 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: db_freelas_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - robo-freelas-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: selenium_chrome
+    restart: unless-stopped
+    shm_size: '2gb'
+    environment:
+      - SE_NODE_MAX_SESSIONS=2
+      - SE_SESSION_RETRY_INTERVAL=2
+    ports:
+      - "4444:4444"
+    networks:
+      - robo-freelas-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4444/wd/hub/status || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  app:
+    build: .
+    container_name: robo_freelas_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      selenium:
+        condition: service_healthy
+    networks:
+      - robo-freelas-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  robo-freelas-network:
+    driver: bridge
